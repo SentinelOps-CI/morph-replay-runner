@@ -1,0 +1,96 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "CERT-V1 Certificate Schema",
+  "description": "Certificate format for replay execution results",
+  "type": "object",
+  "required": ["version", "timestamp", "replay_id", "status", "evidence"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "enum": ["1.0"],
+      "description": "CERT-V1 schema version"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of certificate generation"
+    },
+    "replay_id": {
+      "type": "string",
+      "description": "Unique identifier for the replay execution"
+    },
+    "bundle_hash": {
+      "type": "string",
+      "description": "SHA-256 hash of the replay bundle"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["PASS", "FAIL", "ERROR", "TIMEOUT"],
+      "description": "Execution status of the replay"
+    },
+    "execution_time_ms": {
+      "type": "number",
+      "description": "Execution time in milliseconds"
+    },
+    "evidence": {
+      "type": "object",
+      "description": "Evidence collected during replay execution",
+      "properties": {
+        "stdout": {
+          "type": "string",
+          "description": "Standard output from replay execution"
+        },
+        "stderr": {
+          "type": "string",
+          "description": "Standard error from replay execution"
+        },
+        "exit_code": {
+          "type": "integer",
+          "description": "Exit code from replay process"
+        },
+        "files_created": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of files created during execution"
+        },
+        "network_connections": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "protocol": {"type": "string"},
+              "local_addr": {"type": "string"},
+              "remote_addr": {"type": "string"},
+              "port": {"type": "integer"}
+            }
+          },
+          "description": "Network connections made during execution"
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Additional metadata about the replay execution",
+      "properties": {
+        "instance_id": {
+          "type": "string",
+          "description": "Morph Cloud instance ID used for execution"
+        },
+        "snapshot_id": {
+          "type": "string",
+          "description": "Base snapshot ID used for execution"
+        },
+        "replay_tool_version": {
+          "type": "string",
+          "description": "Version of the replay tool used"
+        },
+        "environment": {
+          "type": "object",
+          "description": "Environment variables and system information"
+        }
+      }
+    }
+  }
+}

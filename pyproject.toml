@@ -1,0 +1,75 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "morph-replay-runner"
+version = "0.1.0"
+description = "CLI tool for running TRACE-REPLAY-KIT bundles with branch-N parallelism on Morph Cloud"
+authors = [
+    {name = "SentinelOps-CI", email = "team@sentinelops.ci"}
+]
+readme = "README.md"
+license = {text = "Apache-2.0"}
+requires-python = ">=3.8"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "morphcloud>=0.1.91",
+    "click>=8.0.0",
+    "pydantic>=2.0.0",
+    "rich>=13.0.0",
+    "aiofiles>=23.0.0",
+    "asyncio-mqtt>=0.16.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "black>=23.0.0",
+    "isort>=5.12.0",
+    "mypy>=1.0.0",
+    "ruff>=0.1.0",
+]
+
+[project.scripts]
+replay-runner = "runner.main:main"
+
+[project.urls]
+Homepage = "https://github.com/SentinelOps-CI/morph-replay-runner"
+Repository = "https://github.com/SentinelOps-CI/morph-replay-runner"
+Issues = "https://github.com/SentinelOps-CI/morph-replay-runner/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["runner*", "schemas*"]
+
+[tool.black]
+line-length = 88
+target-version = ['py38']
+
+[tool.isort]
+profile = "black"
+line_length = 88
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+
+[tool.ruff]
+target-version = "py38"
+line-length = 88
+select = ["E", "F", "B", "I", "N", "UP", "W", "C4", "SIM", "ARG", "PIE", "T20", "Q", "RSE", "RET", "SLF", "SLOT", "TCH", "TID", "TCH", "ARG", "PIE", "SIM", "LOG", "RUF"]
+ignore = ["E501", "B008", "C901"]

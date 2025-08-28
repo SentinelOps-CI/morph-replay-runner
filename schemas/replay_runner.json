@@ -1,0 +1,135 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Replay Runner Schema",
+  "description": "Internal schema for runner configuration and execution reports",
+  "type": "object",
+  "definitions": {
+    "execution_result": {
+      "type": "object",
+      "required": ["bundle_path", "status", "execution_time_ms", "cert_path"],
+      "properties": {
+        "bundle_path": {
+          "type": "string",
+          "description": "Path to the replay bundle file"
+        },
+        "bundle_hash": {
+          "type": "string",
+          "description": "SHA-256 hash of the bundle file"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["PASS", "FAIL", "ERROR", "TIMEOUT"],
+          "description": "Execution status"
+        },
+        "execution_time_ms": {
+          "type": "number",
+          "description": "Execution time in milliseconds"
+        },
+        "cert_path": {
+          "type": "string",
+          "description": "Path to the generated certificate file"
+        },
+        "log_path": {
+          "type": "string",
+          "description": "Path to the execution log file"
+        },
+        "instance_id": {
+          "type": "string",
+          "description": "Morph Cloud instance ID used"
+        },
+        "error_message": {
+          "type": "string",
+          "description": "Error message if execution failed"
+        },
+        "http_service_url": {
+          "type": "string",
+          "description": "URL of exposed HTTP service if applicable"
+        }
+      }
+    }
+  },
+  "properties": {
+    "runner_config": {
+      "type": "object",
+      "required": ["snapshot_id", "parallel_count", "timeout_seconds"],
+      "properties": {
+        "snapshot_id": {
+          "type": "string",
+          "description": "Base snapshot ID or digest"
+        },
+        "parallel_count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "description": "Number of parallel instances"
+        },
+        "timeout_seconds": {
+          "type": "integer",
+          "minimum": 60,
+          "description": "Execution timeout in seconds"
+        },
+        "emit_cert": {
+          "type": "boolean",
+          "description": "Whether to emit CERT-V1 certificates"
+        },
+        "output_directory": {
+          "type": "string",
+          "description": "Output directory for evidence collection"
+        },
+        "http_callback": {
+          "type": "object",
+          "properties": {
+            "enabled": {"type": "boolean"},
+            "auth_mode": {"type": "string", "enum": ["none", "api_key"]},
+            "port": {"type": "integer"}
+          }
+        }
+      }
+    },
+    "execution_summary": {
+      "type": "object",
+      "required": ["start_time", "end_time", "total_bundles", "results"],
+      "properties": {
+        "start_time": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Execution start timestamp"
+        },
+        "end_time": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Execution end timestamp"
+        },
+        "total_bundles": {
+          "type": "integer",
+          "description": "Total number of bundles processed"
+        },
+        "successful": {
+          "type": "integer",
+          "description": "Number of successful executions"
+        },
+        "failed": {
+          "type": "integer",
+          "description": "Number of failed executions"
+        },
+        "timed_out": {
+          "type": "integer",
+          "description": "Number of timed out executions"
+        },
+        "total_execution_time_ms": {
+          "type": "number",
+          "description": "Total execution time across all instances"
+        },
+        "average_execution_time_ms": {
+          "type": "number",
+          "description": "Average execution time per bundle"
+        },
+        "results": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/execution_result"},
+          "description": "Detailed results for each bundle"
+        }
+      }
+    }
+  }
+}

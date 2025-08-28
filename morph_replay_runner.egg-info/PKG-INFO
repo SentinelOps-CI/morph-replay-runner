@@ -1,0 +1,35 @@
+Metadata-Version: 2.4
+Name: morph-replay-runner
+Version: 0.1.0
+Summary: CLI tool for running TRACE-REPLAY-KIT bundles with branch-N parallelism on Morph Cloud
+Author-email: SentinelOps-CI <team@sentinelops.ci>
+License: Apache-2.0
+Project-URL: Homepage, https://github.com/SentinelOps-CI/morph-replay-runner
+Project-URL: Repository, https://github.com/SentinelOps-CI/morph-replay-runner
+Project-URL: Issues, https://github.com/SentinelOps-CI/morph-replay-runner/issues
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+Requires-Dist: morphcloud>=0.1.91
+Requires-Dist: click>=8.0.0
+Requires-Dist: pydantic>=2.0.0
+Requires-Dist: rich>=13.0.0
+Requires-Dist: aiofiles>=23.0.0
+Requires-Dist: asyncio-mqtt>=0.16.0
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0.0; extra == "dev"
+Requires-Dist: pytest-asyncio>=0.21.0; extra == "dev"
+Requires-Dist: black>=23.0.0; extra == "dev"
+Requires-Dist: isort>=5.12.0; extra == "dev"
+Requires-Dist: mypy>=1.0.0; extra == "dev"
+Requires-Dist: ruff>=0.1.0; extra == "dev"
+
+

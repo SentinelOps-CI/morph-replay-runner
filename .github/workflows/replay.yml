@@ -1,0 +1,148 @@
+name: Replay Runner CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+    inputs:
+      snapshot_id:
+        description: 'Morph snapshot ID to test with'
+        required: true
+        default: 'morphvm-minimal'
+      parallel_count:
+        description: 'Number of parallel instances'
+        required: false
+        default: '2'
+
+env:
+  MORPH_API_KEY: ${{ secrets.MORPH_API_KEY }}
+
+jobs:
+  test-replay-bundles:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10, 3.11]
+        bundle: [demo-http, demo-tcp, demo-file]
+        parallel: [1, 2]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e ".[dev]"
+        
+    - name: Create demo bundles
+      run: |
+        mkdir -p replays
+        # Create demo HTTP bundle
+        echo '{"type": "http", "url": "https://httpbin.org/get"}' > replays/demo-http.json
+        zip -j replays/demo-http.zip replays/demo-http.json
+        
+        # Create demo TCP bundle
+        echo '{"type": "tcp", "host": "localhost", "port": 8080}' > replays/demo-tcp.json
+        zip -j replays/demo-tcp.zip replays/demo-tcp.json
+        
+        # Create demo file bundle
+        echo '{"type": "file", "path": "/tmp/test.txt"}' > replays/demo-file.json
+        zip -j replays/demo-file.zip replays/demo-file.json
+        
+    - name: Run replay runner
+      env:
+        MORPH_API_KEY: ${{ secrets.MORPH_API_KEY }}
+      run: |
+        python -m runner.main \
+          --snapshot ${{ github.event.inputs.snapshot_id || 'morphvm-minimal' }} \
+          --bundles "replays/${{ matrix.bundle }}.zip" \
+          --parallel ${{ matrix.parallel }} \
+          --timeout 300 \
+          --emit-cert \
+          --out "./evidence-${{ matrix.bundle }}-${{ matrix.parallel }}"
+          
+    - name: Upload evidence artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: evidence-${{ matrix.bundle }}-${{ matrix.parallel }}
+        path: |
+          evidence-${{ matrix.bundle }}-${{ matrix.parallel }}/certs/
+          evidence-${{ matrix.bundle }}-${{ matrix.parallel }}/logs/
+          evidence-${{ matrix.bundle }}-${{ matrix.parallel }}/reports/
+        retention-days: 30
+        
+    - name: Validate certificates
+      run: |
+        # Check if certificates were generated
+        if [ -f "evidence-${{ matrix.bundle }}-${{ matrix.parallel }}/certs/cert_0.json" ]; then
+          echo "✓ Certificate generated successfully"
+          # Basic JSON validation
+          python -c "import json; json.load(open('evidence-${{ matrix.bundle }}-${{ matrix.parallel }}/certs/cert_0.json'))"
+        else
+          echo "✗ No certificate generated"
+          exit 1
+        fi
+        
+  integration-test:
+    runs-on: ubuntu-latest
+    needs: test-replay-bundles
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.11
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e ".[dev]"
+        
+    - name: Download all evidence artifacts
+      uses: actions/download-artifact@v3
+      
+    - name: Run integration tests
+      run: |
+        # Test that all evidence directories contain expected files
+        for dir in evidence-*; do
+          echo "Checking $dir..."
+          [ -d "$dir/certs" ] || exit 1
+          [ -d "$dir/logs" ] || exit 1
+          [ -d "$dir/reports" ] || exit 1
+          [ -f "$dir/reports/index.json" ] || exit 1
+          echo "✓ $dir structure is valid"
+        done
+        
+    - name: Generate summary report
+      run: |
+        python -c "
+        import json
+        import glob
+        
+        summary = {
+            'total_runs': len(glob.glob('evidence-*')),
+            'timestamp': '$(date -u +%Y-%m-%dT%H:%M:%SZ)',
+            'status': 'success'
+        }
+        
+        with open('ci-summary.json', 'w') as f:
+            json.dump(summary, f, indent=2)
+        "
+        
+    - name: Upload CI summary
+      uses: actions/upload-artifact@v3
+      with:
+        name: ci-summary
+        path: ci-summary.json
+        retention-days: 90

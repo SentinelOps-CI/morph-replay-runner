@@ -1,0 +1,58 @@
+{
+  "version": "2.1.0",
+  "manifest": {
+    "bundle_id": "demo-file-operations",
+    "created_at": "2025-01-01T00:00:00Z",
+    "description": "Demo file operations replay",
+    "tags": ["demo", "file", "operations"],
+    "author": "SentinelOps-CI",
+    "expected_duration_ms": 1000
+  },
+  "replay_data": {
+    "type": "file",
+    "payload": {
+      "operations": [
+        {
+          "action": "create",
+          "path": "/tmp/test_file.txt",
+          "content": "Hello from Morph Replay Runner!"
+        },
+        {
+          "action": "read",
+          "path": "/tmp/test_file.txt"
+        },
+        {
+          "action": "delete",
+          "path": "/tmp/test_file.txt"
+        }
+      ]
+    },
+    "preconditions": [
+      {
+        "type": "filesystem",
+        "condition": "Write access to /tmp directory",
+        "timeout_ms": 1000
+      }
+    ],
+    "postconditions": [
+      {
+        "type": "file",
+        "condition": "File operations completed successfully",
+        "expected_result": "success"
+      }
+    ]
+  },
+  "dependencies": [
+    {
+      "name": "coreutils",
+      "version": "8.0+",
+      "type": "package"
+    }
+  ],
+  "execution_config": {
+    "timeout_ms": 5000,
+    "retry_count": 0,
+    "environment": {},
+    "working_directory": "/tmp"
+  }
+}

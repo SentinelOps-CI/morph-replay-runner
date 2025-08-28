@@ -1,0 +1,49 @@
+{
+  "version": "2.1.0",
+  "manifest": {
+    "bundle_id": "demo-tcp-connect",
+    "created_at": "2025-01-01T00:00:00Z",
+    "description": "Demo TCP connection replay",
+    "tags": ["demo", "tcp", "connect"],
+    "author": "SentinelOps-CI",
+    "expected_duration_ms": 3000
+  },
+  "replay_data": {
+    "type": "tcp",
+    "payload": {
+      "host": "localhost",
+      "port": 8080,
+      "timeout": 5,
+      "data": "GET / HTTP/1.1\r\nHost: localhost\r\n\r\n"
+    },
+    "preconditions": [
+      {
+        "type": "service",
+        "condition": "Local service running on port 8080",
+        "timeout_ms": 2000
+      }
+    ],
+    "postconditions": [
+      {
+        "type": "connection",
+        "condition": "TCP connection established",
+        "expected_result": "success"
+      }
+    ]
+  },
+  "dependencies": [
+    {
+      "name": "netcat",
+      "version": "1.0+",
+      "type": "package"
+    }
+  ],
+  "execution_config": {
+    "timeout_ms": 8000,
+    "retry_count": 1,
+    "environment": {
+      "NC_TIMEOUT": "5"
+    },
+    "working_directory": "/tmp"
+  }
+}

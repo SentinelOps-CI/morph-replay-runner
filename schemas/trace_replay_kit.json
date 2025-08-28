@@ -1,0 +1,118 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "TRACE-REPLAY-KIT Bundle Schema",
+  "description": "Schema for replay bundle format and execution interface",
+  "type": "object",
+  "required": ["version", "manifest", "replay_data"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "enum": ["2.1.0"],
+      "description": "TRACE-REPLAY-KIT schema version"
+    },
+    "manifest": {
+      "type": "object",
+      "required": ["bundle_id", "created_at", "description"],
+      "properties": {
+        "bundle_id": {
+          "type": "string",
+          "description": "Unique identifier for the replay bundle"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp of bundle creation"
+        },
+        "description": {
+          "type": "string",
+          "description": "Human-readable description of the replay"
+        },
+        "tags": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Tags for categorizing the replay"
+        },
+        "author": {
+          "type": "string",
+          "description": "Author of the replay bundle"
+        },
+        "expected_duration_ms": {
+          "type": "number",
+          "description": "Expected execution duration in milliseconds"
+        }
+      }
+    },
+    "replay_data": {
+      "type": "object",
+      "required": ["type", "payload"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["http", "tcp", "file", "process", "custom"],
+          "description": "Type of replay to execute"
+        },
+        "payload": {
+          "type": "object",
+          "description": "Replay-specific payload data"
+        },
+        "preconditions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": {"type": "string"},
+              "condition": {"type": "string"},
+              "timeout_ms": {"type": "number"}
+            }
+          },
+          "description": "Preconditions that must be met before execution"
+        },
+        "postconditions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": {"type": "string"},
+              "condition": {"type": "string"},
+              "expected_result": {"type": "string"}
+            }
+          },
+          "description": "Postconditions to verify after execution"
+        }
+      }
+    },
+    "dependencies": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {"type": "string"},
+          "version": {"type": "string"},
+          "type": {"type": "string", "enum": ["package", "file", "service"]}
+        }
+      },
+      "description": "Dependencies required for replay execution"
+    },
+    "execution_config": {
+      "type": "object",
+      "properties": {
+        "timeout_ms": {
+          "type": "number",
+          "description": "Maximum execution time in milliseconds"
+        },
+        "retry_count": {
+          "type": "integer",
+          "description": "Number of retry attempts on failure"
+        },
+        "environment": {
+          "type": "object",
+          "description": "Environment variables to set during execution"
+        },
+        "working_directory": {
+          "type": "string",
+          "description": "Working directory for execution"
+        }
+      }
+    }
+  }
+}
