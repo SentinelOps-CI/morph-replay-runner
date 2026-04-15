@@ -1,20 +1,12 @@
+<div align="center">
+
 # morph-replay-runner
 
 **morph-replay-runner** is a command-line interface (CLI) tool designed to execute TRACE-REPLAY-KIT bundles with branch-N parallelism on Morph Cloud. This tool streamlines the process of running replay tasks, ensuring efficient and scalable execution with comprehensive evidence collection and CERT-V1 compliance.
 
-## Table of Contents
+</div>
 
-1. [Installation](#installation)
-2. [Quick Start](#quick-start)
-3. [Usage](#usage)
-4. [Configuration](#configuration)
-5. [Error Handling](#error-handling)
-6. [Project Structure](#project-structure)
-7. [Examples](#examples)
-8. [Docker Support](#docker-support)
-9. [CI/CD Pipeline](#cicd-pipeline)
-10. [Contributing](#contributing)
-11. [License](#license)
+---
 
 ## Installation
 
