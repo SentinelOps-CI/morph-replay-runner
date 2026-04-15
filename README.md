@@ -290,6 +290,6 @@ We welcome contributions to **morph-replay-runner**! To contribute:
 - **Ruff**: Linting and formatting
 - **MyPy**: Type checking
 
-## 📄 License
+## License
 
 **morph-replay-runner** is licensed under the Apache License 2.0. See the [LICENSE](LICENSE) file for more details.
