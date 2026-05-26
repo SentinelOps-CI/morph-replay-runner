@@ -1,6 +1,29 @@
 <div align="center">
 
-# morph-replay-runner
+<pre>
+##############################################################################################
+#                                                                                            #
+#                            __  __  ___  ____  ____  _   _                                  #
+#                           |  \/  |/ _ \|  _ \|  _ \| | | |                                 #
+#                           | |\/| | | | | |_) | |_) | |_| |                                 #
+#                           | |  | | |_| |  _ <|  __/|  _  |                                 #
+#                           |_|  |_|\___/|_| \_\_|   |_| |_|                                 #
+#                                                                                            #
+#                          ____  _____ ____  _        _ __   __                              #
+#                         |  _ \| ____|  _ \| |      / \\ \ / /                              #
+#                         | |_) |  _| | |_) | |     / _ \\ V /                               #
+#                         |  _ <| |___|  __/| |___ / ___ \| |                                #
+#                         |_| \_\_____|_|   |_____/_/   \_\_|                                #
+#                                                                                            #
+#                          ____  _   _ _   _ _   _ _____ ____                                #
+#                         |  _ \| | | | \ | | \ | | ____|  _ \                               #
+#                         | |_) | | | |  \| |  \| |  _| | |_) |                              #
+#                         |  _ <| |_| | |\  | |\  | |___|  _ <                               #
+#                         |_| \_\\___/|_| \_|_| \_|_____|_| \_\                              #
+#                                                                                            #
+#                                                                                            #
+##############################################################################################
+</pre>
 
 **morph-replay-runner** is a command-line interface (CLI) tool designed to execute TRACE-REPLAY-KIT bundles with branch-N parallelism on Morph Cloud. This tool streamlines the process of running replay tasks, ensuring efficient and scalable execution with comprehensive evidence collection and CERT-V1 compliance.
 
