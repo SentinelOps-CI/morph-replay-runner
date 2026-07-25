@@ -1,4 +1,4 @@
-"""Morph Replay Runner - CLI tool for running TRACE-REPLAY-KIT bundles with branch-N parallelism on Morph Cloud."""
+"""Hermetic branch-N replay runner with observational PCS/PIP evidence."""
 
 __version__ = "0.1.0"
 __author__ = "SentinelOps-CI"
