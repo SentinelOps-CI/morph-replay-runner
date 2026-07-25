@@ -1,0 +1,61 @@
+{
+  "budgets": {
+    "accelerator_count": 0,
+    "api_call_budget": 0,
+    "cpu_cores": 2,
+    "memory_mib": 1024,
+    "storage_mib": 2048,
+    "token_budget": 0,
+    "wall_time_ms": 60000
+  },
+  "clock_policy": {
+    "fixed_epoch_ms": 1700000000000,
+    "mode": "frozen"
+  },
+  "container_image_digests": [
+    "sha256:6105d6cc76af400325e94d588ce511be5bfdbb73b437dc51eca43917d7a43e3d"
+  ],
+  "dependency_lock_digest": "sha256:0c030586945fe504b604ecc2e875c38ede400cd5cd73da9730302162e6b02c6f",
+  "environment": {
+    "profile_name": "hermetic-demo",
+    "profile_version": "1.0.0"
+  },
+  "integrity": {
+    "artifact_digest": "sha256:130d846c41fc26fa002d68e1a854faaeabeaf429069807437b2c14f761eada07",
+    "canonicalization_version": "v1"
+  },
+  "network_policy": {
+    "allowlist_hosts": [],
+    "mode": "no_network",
+    "partner_local_paths": [],
+    "synthetic_dependency_digests": []
+  },
+  "os_runtime": {
+    "os": "linux",
+    "runtime": "python3.11"
+  },
+  "output_retention": {
+    "mode": "retain",
+    "retention_days": 30
+  },
+  "profile_digest": "sha256:130d846c41fc26fa002d68e1a854faaeabeaf429069807437b2c14f761eada07",
+  "profile_id": "profile-demo",
+  "random_seed_policy": {
+    "seed": 42
+  },
+  "schema_version": "mrr.ExecutionProfile.v1",
+  "secret_refs": [
+    {
+      "purpose": "optional-morph",
+      "secret_ref": "vault/morph/api"
+    }
+  ],
+  "snapshot": {
+    "snapshot_digest": "sha256:9047a18b16b4542b7388faa6d97a47a79c793d0fa280013bb0587fa35f932785",
+    "snapshot_id": "snap-demo"
+  },
+  "source_commit": "b3018d790e3e7c622b28641c0230a61bb3b78955",
+  "tool_versions": {
+    "replay-runner": "0.1.0"
+  }
+}
