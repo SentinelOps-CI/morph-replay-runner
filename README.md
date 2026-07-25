@@ -1,310 +1,184 @@
-<div align="center">
+# morph-replay-runner
 
-<pre>
-##############################################################################################
-#                                                                                            #
-#                            __  __  ___  ____  ____  _   _                                  #
-#                           |  \/  |/ _ \|  _ \|  _ \| | | |                                 #
-#                           | |\/| | | | | |_) | |_) | |_| |                                 #
-#                           | |  | | |_| |  _ <|  __/|  _  |                                 #
-#                           |_|  |_|\___/|_| \_\_|   |_| |_|                                 #
-#                                                                                            #
-#                          ____  _____ ____  _        _ __   __                              #
-#                         |  _ \| ____|  _ \| |      / \\ \ / /                              #
-#                         | |_) |  _| | |_) | |     / _ \\ V /                               #
-#                         |  _ <| |___|  __/| |___ / ___ \| |                                #
-#                         |_| \_\_____|_|   |_____/_/   \_\_|                                #
-#                                                                                            #
-#                          ____  _   _ _   _ _   _ _____ ____                                #
-#                         |  _ \| | | | \ | | \ | | ____|  _ \                               #
-#                         | |_) | | | |  \| |  \| |  _| | |_) |                              #
-#                         |  _ <| |_| | |\  | |\  | |___|  _ <                               #
-#                         |_| \_\\___/|_| \_|_| \_|_____|_| \_\                              #
-#                                                                                            #
-#                                                                                            #
-##############################################################################################
-</pre>
+[![CI](https://github.com/SentinelOps-CI/morph-replay-runner/actions/workflows/ci.yml/badge.svg)](https://github.com/SentinelOps-CI/morph-replay-runner/actions/workflows/ci.yml)
+[![Python](https://img.shields.io/badge/python-3.9%20%7C%203.10%20%7C%203.11%20%7C%203.12-blue)](pyproject.toml)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
-**morph-replay-runner** is a command-line interface (CLI) tool designed to execute TRACE-REPLAY-KIT bundles with branch-N parallelism on Morph Cloud. This tool streamlines the process of running replay tasks, ensuring efficient and scalable execution with comprehensive evidence collection and CERT-V1 compliance.
+Hermetic, immutable **branch-N** execution backend for SentinelOps-CI.
+Produces observational PCS (`RuntimeReceipt.v0`) and PIP (Morph / transformation) evidence packs.
 
-</div>
+Default path is offline via `LocalFakeProvider`. Live Morph Cloud is opt-in and requires `MORPH_API_KEY`.
 
----
+## Status
 
-## Installation
+Version **0.1.0** (Alpha). Primary command: `replay-runner branch`.
+Legacy ZIP Morph path: `replay-runner run` (also accepts bare `--snapshot …` argv).
 
-### Prerequisites
+What this release implements:
 
-- Python 3.9 or later
-- Morph Cloud API key
-- Access to Morph Cloud snapshots
+- Hermetic branch-N scheduler with per-branch isolation and fail-closed hermeticity preflight
+- ExecutionProfile schema, canonical digest, secret-ref validation
+- Provider protocol: `LocalFakeProvider` (CI default) + Morph adapter (opt-in)
+- Resource accounting with explicit `unavailable` metrics
+- Differential reports (`absent ≠ equal`)
+- Always-on vendored JSON Schema validation; optional external `pcs` / `post-incident` gates
 
-### Install from Source
+See [NON_CLAIMS.md](NON_CLAIMS.md) for claim boundaries. Architecture: [docs/adr/](docs/adr/README.md).
+
+## Requirements
+
+- Python **3.9+** (CI: 3.9–3.12)
+- Optional: `MORPH_API_KEY` for live Morph (`replay-runner run` / `--provider morph`)
+- Optional extras: `pcs`, `pip` (`post-incident`), `ovk` for deeper CLI gates
+
+## Install
 
 ```bash
-# Clone the repository
-git clone https://github.com/SentinelOps-CI/morph-replay-runner.git
-cd morph-replay-runner
-
-# Install in development mode
-pip install -e .
-```
-
-### Install Dependencies
-
-```bash
-# Install all dependencies
-pip install -r requirements.txt
-
-# Or install with development tools
+python -m pip install --upgrade pip
 pip install -e ".[dev]"
 ```
 
-## Quick Start
+Refresh fixtures/examples after generator changes:
 
 ```bash
-# Basic usage
-replay-runner \
+python scripts/generate_fixtures.py
+```
+
+## Quick start (hermetic, offline)
+
+```bash
+replay-runner branch \
+  --incident examples/hermetic-branch-n/incident_bundle.json \
+  --snapshot examples/hermetic-branch-n/snapshot_ref.json \
+  --snapshot-payload examples/hermetic-branch-n/snapshot.payload \
+  --interventions examples/hermetic-branch-n/interventions \
+  --execution-profile examples/hermetic-branch-n/execution_profile.json \
+  --manifest examples/hermetic-branch-n/manifest.json \
+  --parallel 16 \
+  --provider local-fake \
+  --out ./branches
+```
+
+No Morph credentials required. Exit is non-zero if any branch is `partial` unless `--allow-partial` is set.
+
+## Morph opt-in (compatibility path)
+
+Requires `MORPH_API_KEY` in the environment. Without it, the GitHub Actions `morph-opt-in` job is skipped.
+
+```bash
+export MORPH_API_KEY=...   # never commit
+replay-runner run \
   --snapshot morphvm-minimal \
   --bundles "./replays/*.zip" \
   --parallel 4 \
-  --emit-cert \
+  --provider morph \
   --out ./evidence
-
-# With HTTP callbacks
-replay-runner \
-  --snapshot morphvm-minimal \
-  --bundles "./examples/*.zip" \
-  --parallel 2 \
-  --http-callback \
-  --http-port 8080 \
-  --http-auth api_key
-
-# Asynchronous mode
-replay-runner \
-  --snapshot morphvm-minimal \
-  --bundles "./replays/*.zip" \
-  --parallel 8 \
-  --async \
-  --timeout 1200
 ```
 
-## Usage
+Legacy argv without a subcommand (`replay-runner --snapshot …`) still maps to `run`.
+`--http-callback` is rejected fail-closed (unimplemented / out of scope for hermetic branch-N).
 
-### Command Line Options
+## CLI reference
+
+| Command | Purpose |
+|---------|---------|
+| `replay-runner branch` | Hermetic isolated branch-N execution (primary) |
+| `replay-runner run` | Legacy ZIP-bundle Morph path |
+| `replay-runner profile validate --file …` | Validate ExecutionProfile |
+| `replay-runner profile digest --file …` | Print profile digest |
+| `replay-runner diff --branches … --pairs a,b --out …` | Pairwise differential reports |
+| `replay-runner validate` | Schema mirrors + vendored instance checks |
+| `replay-runner validate --external-clis` | Also run pcs/post-incident when installed |
+
+Useful `branch` flags:
+
+- `--provider local-fake|morph` (default `local-fake`)
+- `--snapshot-payload` — raw bytes whose sha256 must match `snapshot_digest`
+- `--allow-partial` — accept explicit partial branches (default: fail closed)
+- `--ovk-check <target>` — shell out to OVK on PATH; fail closed if missing when set
+
+## Evidence layout
+
+Each `branches/<branch_id>/` is an immutable evidence pack:
+
+```text
+execution_profile.json
+snapshot_ref.json
+intervention_record.json
+runtime_receipt.json          # PCS RuntimeReceipt.v0
+morph_replay_report.json      # PIP
+transformation_record.json    # PIP
+resource_report.json
+terminal_state.json
+terminal_commitment.json
+branch_report.json
+teardown_receipt.json
+digests.json
+logs.txt
+status.json                   # complete | partial
+```
+
+Run root also includes `hermeticity_evidence.json` and `summary.json` (with `non_claims`).
+
+## Differential reports
 
 ```bash
-replay-runner --help
+replay-runner diff --branches ./branches --pairs branch-00,branch-01 --out ./diffs
 ```
 
-**Required Options:**
-- `--snapshot`: Base snapshot ID or digest containing sidecar + replay tools
-- `--bundles`: Glob pattern for replay bundles (e.g., `./replays/*.zip`)
+Comparisons use `equal | different | absent_left | absent_right | absent_both`.
+Missing data is never coerced to equal. Outputs ban preferred-branch / causality language.
 
-**Optional Options:**
-- `-p, --parallel`: Number of parallel instances (default: 4)
-- `-t, --timeout`: Execution timeout in seconds (default: 600)
-- `--emit-cert/--no-emit-cert`: Emit CERT-V1 JSON certificates (default: True)
-- `-o, --out`: Output directory for evidence collection (default: `./evidence`)
-- `--async`: Use asynchronous execution mode
-- `--http-callback`: Enable HTTP callback service for demos
-- `--http-port`: Port for HTTP callback service (default: 8080)
-- `--http-auth`: HTTP callback authentication mode (`none` or `api_key`)
-
-### Basic Workflow
-
-1. **Prepare Replay Bundles**: Create TRACE-REPLAY-KIT compliant zip files
-2. **Set Environment**: Configure your Morph Cloud API key
-3. **Execute**: Run the tool with appropriate parameters
-4. **Collect Evidence**: Review generated certificates, logs, and reports
-
-## Configuration
-
-### Environment Variables
+## Offline quality gates
 
 ```bash
-# Set your Morph Cloud API key
-export MORPH_API_KEY="your_api_key_here"
+pytest tests -q
+python scripts/check_schema_mirrors.py
+python scripts/validate_vendored_instances.py
+python scripts/optional_external_validate.py   # skips only when pcs/post-incident absent
+python scripts/release_bundle.py
 ```
 
-### Configuration File
+Full release command list: [docs/release-checklist.md](docs/release-checklist.md).
+Contributing: [CONTRIBUTING.md](CONTRIBUTING.md).
 
-The tool automatically detects and uses the `MORPH_API_KEY` environment variable. For advanced configuration, you can modify the `pyproject.toml` file.
+## Layout
 
-## Error Handling
-
-The tool utilizes standard Python exceptions such as `ValueError` and `Exception` to handle errors gracefully. Common error scenarios include:
-
-- **API Key Missing**: Ensure `MORPH_API_KEY` is set
-- **Snapshot Not Found**: Verify snapshot ID exists in Morph Cloud
-- **Bundle Format Issues**: Ensure bundles are valid TRACE-REPLAY-KIT format
-- **Network Issues**: Check connectivity to Morph Cloud
-
-## Project Structure
-
-```
-morph-replay-runner/
-├── runner/                 # Main runner package
-│   ├── __init__.py        # Package initialization
-│   ├── main.py            # CLI entry point
-│   ├── core.py            # Core execution logic
-│   └── models.py          # Data models
-├── schemas/                # JSON schemas
-│   ├── cert_v1.json       # CERT-V1 schema
-│   ├── trace_replay_kit.json # TRACE-REPLAY-KIT schema
-│   └── replay_runner.json # Internal schemas
-├── examples/               # Demo replay bundles
-│   ├── demo-http.json     # HTTP demo
-│   ├── demo-tcp.json      # TCP demo
-│   └── demo-file.json     # File operations demo
-├── docker/                 # Docker support
-│   ├── Dockerfile         # Container image
-│   └── docker-compose.yml # Multi-service setup
-├── .github/workflows/      # CI/CD workflows
-│   └── replay.yml         # Matrix testing workflow
-├── pyproject.toml         # Project configuration
-├── requirements.txt        # Dependencies
-└── README.md              # This file
+```text
+runner/           # CLI, profile, hermeticity, branch, accounting, diff, evidence, providers
+schemas/mrr/      # repo-local domain schemas
+schemas/pcs/      # mirrored pcs-core (RuntimeReceipt.v0 + defs)
+schemas/pip/      # mirrored PIP Morph/lineage schemas
+fixtures/         # valid/invalid profiles, branch inputs, PIP linkage
+examples/hermetic-branch-n/
+docs/adr/         # MRR-ITE architecture decisions
+docs/security/    # threat model
+docs/baseline/    # historical ITE-00 measurement
 ```
 
-## Examples
+## Pins
 
-### Demo Bundles
+| Layer | Pin |
+|-------|-----|
+| PCS | pcs-core `v0.1.0` schemas under `schemas/pcs/` |
+| PIP | post-incident-proofs schemas under `schemas/pip/` |
+| OVK | shell-out only; optional extra wheel `1.2.1` |
+| Morph | `morphcloud>=0.1.91` (live use opt-in via `MORPH_API_KEY`) |
 
-The project includes three example replay bundles:
+Mirror digests and refresh procedure: [schemas/README.md](schemas/README.md).
 
-1. **HTTP Demo** (`examples/demo-http.json`): HTTP GET request to httpbin.org
-2. **TCP Demo** (`examples/demo-tcp.json`): TCP connection to localhost:8080
-3. **File Demo** (`examples/demo-file.json`): File operations in /tmp
+## Documentation
 
-### Creating Custom Bundles
-
-```json
-{
-  "version": "2.1.0",
-  "manifest": {
-    "bundle_id": "my-custom-replay",
-    "created_at": "2025-01-01T00:00:00Z",
-    "description": "Custom replay description",
-    "tags": ["custom", "demo"],
-    "author": "Your Name"
-  },
-  "replay_data": {
-    "type": "http",
-    "payload": {
-      "method": "GET",
-      "url": "https://api.example.com/endpoint"
-    }
-  }
-}
-```
-
-## Docker Support
-
-### Build and Run
-
-```bash
-# Build the Docker image
-docker build -f docker/Dockerfile -t morph-replay-runner .
-
-# Run with Docker
-docker run -e MORPH_API_KEY="your_key" morph-replay-runner --help
-```
-
-### Docker Compose
-
-```bash
-# Start services
-docker-compose -f docker/docker-compose.yml up
-
-# Run with mounted volumes
-docker-compose -f docker/docker-compose.yml run morph-replay-runner \
-  --snapshot morphvm-minimal \
-  --bundles "/app/replays/*.zip"
-```
-
-## CI/CD Pipeline
-
-The project includes a comprehensive GitHub Actions workflow that:
-
-- **Matrix Testing**: Tests across Python versions (3.9, 3.10, 3.11)
-- **Bundle Validation**: Tests different bundle types (HTTP, TCP, File)
-- **Parallel Execution**: Tests various parallel instance counts
-- **Evidence Collection**: Validates generated certificates and reports
-- **Artifact Publishing**: Uploads evidence packs for review
-
-### Workflow Triggers
-
-- **Push**: Automatically runs on pushes to `main` and `develop` branches
-- **Pull Request**: Runs on all PRs for quality assurance
-- **Manual Dispatch**: Can be triggered manually with custom parameters
-
-## Testing
-
-### Local Testing
-
-```bash
-# Install development dependencies
-pip install -e ".[dev]"
-
-# Run tests
-pytest
-
-# Code quality checks
-black .
-isort .
-ruff check .
-mypy .
-```
-
-### CI Testing
-
-The CI pipeline automatically:
-- Creates demo bundles
-- Executes replay runner
-- Validates evidence collection
-- Generates summary reports
-
-## Output Structure
-
-```
-evidence/
-├── certs/                  # CERT-V1 certificates
-│   ├── cert_0.json        # Bundle 0 certificate
-│   ├── cert_1.json        # Bundle 1 certificate
-│   └── ...
-├── logs/                   # Execution logs
-│   ├── log_0.txt          # Bundle 0 log
-│   ├── log_1.txt          # Bundle 1 log
-│   └── ...
-└── reports/                # Summary reports
-    └── index.json         # Execution summary
-```
-
-## Contributing
-
-We welcome contributions to **morph-replay-runner**! To contribute:
-
-1. **Fork** the repository
-2. **Create** a feature branch (`git checkout -b feature/amazing-feature`)
-3. **Commit** your changes (`git commit -m 'Add amazing feature'`)
-4. **Push** to the branch (`git push origin feature/amazing-feature`)
-5. **Open** a Pull Request
-
-### Development Guidelines
-
-- Follow PEP 8 style guidelines
-- Add tests for new functionality
-- Update documentation as needed
-- Ensure all CI checks pass
-
-### Code Quality Tools
-
-- **Black**: Code formatting
-- **Isort**: Import sorting
-- **Ruff**: Linting and formatting
-- **MyPy**: Type checking
+| Doc | Topic |
+|-----|-------|
+| [NON_CLAIMS.md](NON_CLAIMS.md) | Fail-closed claim boundaries |
+| [SECURITY.md](SECURITY.md) | Disclosure and secret handling |
+| [CHANGELOG.md](CHANGELOG.md) | Version history |
+| [docs/security/threat-model.md](docs/security/threat-model.md) | Adversaries and trust boundaries |
+| [docs/adr/](docs/adr/) | MRR-ITE decisions |
+| [docs/baseline/MRR-ITE-00.md](docs/baseline/MRR-ITE-00.md) | Historical baseline |
+| [docs/release-checklist.md](docs/release-checklist.md) | Exact release commands |
 
 ## License
 
-**morph-replay-runner** is licensed under the Apache License 2.0. See the [LICENSE](LICENSE) file for more details.
+Apache-2.0. See [LICENSE](LICENSE).

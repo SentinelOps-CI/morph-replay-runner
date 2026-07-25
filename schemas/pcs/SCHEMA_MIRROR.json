@@ -1,0 +1,22 @@
+{
+  "mirror_name": "pcs-core",
+  "source_repo": "https://github.com/SentinelOps-CI/pcs-core",
+  "source_tag": "v0.1.0",
+  "pinned_commit": "2f0ce059652408bce19bc89ba6660030020d5ea0",
+  "pin_rationale": "pcs-core tag v0.1.0 for RuntimeReceipt.v0; schemas mirrored byte-for-byte for offline validation.",
+  "vendored_files": [
+    "RuntimeReceipt.v0.schema.json",
+    "common.defs.json",
+    "ArtifactIntegrity.v1.schema.json"
+  ],
+  "local_digests": {
+    "RuntimeReceipt.v0.schema.json": "sha256:382506ac0b923a0ee88a9bdadf47827e2aa9afe9c2c50b10f7f7e73df8fc1241",
+    "common.defs.json": "sha256:f1eabfec01af7626347da861e8c95675faf4fd90f05d98b5ecd5b4c0d6b4e2a1",
+    "ArtifactIntegrity.v1.schema.json": "sha256:2468607a3e42d60c9ff0c1b4f461df81207581a3aa81e8dd3544ff197a052f54"
+  },
+  "sync_policy": "Fail CI if local file digests drift from local_digests. Do not edit vendored schemas in-place; bump pin and re-vendor.",
+  "non_claims": [
+    "Mirroring schemas does not imply PF-Core/OVK runtime integration on the default Morph path.",
+    "Runner emits observational RuntimeReceipt.v0 only; claim class is never upgraded."
+  ]
+}

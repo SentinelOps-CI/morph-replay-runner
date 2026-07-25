@@ -1,0 +1,125 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://morph-replay-runner.local/schemas/mrr/branch_replay_manifest.v1.json",
+  "title": "BranchReplayManifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "manifest_id",
+    "incident_ref",
+    "snapshot_ref",
+    "execution_profile_digest",
+    "branches",
+    "retry_policy",
+    "cancellation_policy",
+    "branch_independence"
+  ],
+  "properties": {
+    "schema_version": { "const": "mrr.BranchReplayManifest.v1" },
+    "manifest_id": { "type": "string", "minLength": 1 },
+    "incident_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["incident_id", "incident_digest"],
+      "properties": {
+        "incident_id": { "type": "string", "minLength": 1 },
+        "incident_digest": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        }
+      }
+    },
+    "snapshot_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["snapshot_id", "snapshot_digest"],
+      "properties": {
+        "snapshot_id": { "type": "string", "minLength": 1 },
+        "snapshot_digest": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        }
+      }
+    },
+    "execution_profile_digest": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "branches": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["branch_id", "intervention", "action_sequence"],
+        "properties": {
+          "branch_id": { "type": "string", "minLength": 1 },
+          "intervention": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["intervention_id", "artifact_paths"],
+            "properties": {
+              "intervention_id": { "type": "string", "minLength": 1 },
+              "artifact_paths": {
+                "type": "array",
+                "items": { "type": "string", "minLength": 1 }
+              },
+              "digest": {
+                "type": "string",
+                "pattern": "^sha256:[a-f0-9]{64}$"
+              }
+            }
+          },
+          "action_sequence": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "type": "string", "minLength": 1 }
+          },
+          "policy_checkpoint": { "type": "string" },
+          "verifier_profiles": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1 }
+          },
+          "expected_output_classes": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1 }
+          },
+          "claim_class": {
+            "type": "string",
+            "enum": [
+              "runtime_observed",
+              "RuntimeObserved",
+              "RuntimeChecked",
+              "ReplayValidated"
+            ]
+          }
+        }
+      }
+    },
+    "retry_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["max_retries", "retry_on"],
+      "properties": {
+        "max_retries": { "type": "integer", "minimum": 0 },
+        "retry_on": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["TIMEOUT", "ERROR", "FAILED"]
+          }
+        }
+      }
+    },
+    "cancellation_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["cancel_others_on_failure"],
+      "properties": {
+        "cancel_others_on_failure": { "type": "boolean" }
+      }
+    },
+    "branch_independence": { "type": "boolean" }
+  }
+}

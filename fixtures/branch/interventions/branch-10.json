@@ -1,0 +1,11 @@
+{
+  "branch_id": "branch-10",
+  "intervention_id": "iv-10",
+  "artifact_paths": [
+    "branch-10.json"
+  ],
+  "action_sequence": [
+    "replay",
+    "branch-10"
+  ]
+}

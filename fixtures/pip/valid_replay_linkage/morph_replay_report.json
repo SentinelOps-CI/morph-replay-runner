@@ -1,0 +1,16 @@
+{
+  "schema_version": "pip.MorphReplayReport.v1",
+  "replay_id": "morph-replay-mrr-001",
+  "branch_id": "branch-00",
+  "replay_identity_digest": "sha256:985a5e7b20cd925ba65f3c58921a7b5d4343000f7f19e2cf6532320d8fea0ca5",
+  "input_artifact_digests": [
+    "sha256:8b82eb9475941110dc4bb6225594876cfabbf4676dafbeebe764c9021352df1a"
+  ],
+  "output_artifact_digests": [
+    "sha256:985a5e7b20cd925ba65f3c58921a7b5d4343000f7f19e2cf6532320d8fea0ca5"
+  ],
+  "status": "recorded",
+  "lineage_node_ids": [
+    "n2"
+  ]
+}

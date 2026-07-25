@@ -1,12 +1,14 @@
-"""Data models for the Morph Replay Runner."""
+"""Data models for the Morph Replay Runner (legacy ZIP path)."""
+
+from __future__ import annotations
 
 import hashlib
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
-from typing import List, Optional
+from typing import Optional
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 
 class HttpCallbackConfig(BaseModel):
@@ -29,11 +31,12 @@ class RunnerConfig(BaseModel):
     output_directory: str = "./evidence"
     http_callback: HttpCallbackConfig = Field(default_factory=HttpCallbackConfig)
 
-    @validator("output_directory")
-    def validate_output_directory(cls, v):
+    @field_validator("output_directory")
+    @classmethod
+    def validate_output_directory(cls, value: str) -> str:
         """Ensure output directory exists and is writable."""
-        os.makedirs(v, exist_ok=True)
-        return v
+        os.makedirs(value, exist_ok=True)
+        return value
 
 
 class ExecutionResult(BaseModel):
@@ -49,21 +52,21 @@ class ExecutionResult(BaseModel):
     error_message: Optional[str] = None
     http_service_url: Optional[str] = None
 
-    @validator("bundle_hash", pre=True, always=True)
-    def compute_bundle_hash(cls, v, values):
+    @model_validator(mode="after")
+    def compute_bundle_hash(self) -> ExecutionResult:
         """Compute SHA-256 hash of the bundle file if not provided."""
-        if v is None and "bundle_path" in values:
-            bundle_path = values["bundle_path"]
-            if os.path.exists(bundle_path):
-                with open(bundle_path, "rb") as f:
-                    return hashlib.sha256(f.read()).hexdigest()
-        return v
+        if self.bundle_hash is None and os.path.exists(self.bundle_path):
+            with open(self.bundle_path, "rb") as handle:
+                self.bundle_hash = hashlib.sha256(handle.read()).hexdigest()
+        return self
 
 
 class ExecutionSummary(BaseModel):
     """Summary of all replay executions."""
 
-    start_time: datetime = Field(default_factory=datetime.utcnow)
+    start_time: datetime = Field(
+        default_factory=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
     end_time: Optional[datetime] = None
     total_bundles: int = 0
     successful: int = 0
@@ -71,14 +74,14 @@ class ExecutionSummary(BaseModel):
     timed_out: int = 0
     total_execution_time_ms: int = 0
     average_execution_time_ms: float = 0.0
-    results: List[ExecutionResult] = Field(default_factory=list)
+    results: list[ExecutionResult] = Field(default_factory=list)
 
-    @validator("end_time", pre=True, always=True)
-    def set_end_time(cls, v):
+    @model_validator(mode="after")
+    def set_end_time(self) -> ExecutionSummary:
         """Set end time if not provided."""
-        if v is None:
-            return datetime.utcnow()
-        return v
+        if self.end_time is None:
+            self.end_time = datetime.now(timezone.utc).replace(tzinfo=None)
+        return self
 
     @property
     def success_rate(self) -> float:
@@ -87,12 +90,11 @@ class ExecutionSummary(BaseModel):
             return 0.0
         return (self.successful / self.total_bundles) * 100
 
-    def add_result(self, result: ExecutionResult):
+    def add_result(self, result: ExecutionResult) -> None:
         """Add an execution result and update summary statistics."""
         self.results.append(result)
         self.total_bundles = len(self.results)
 
-        # Update counters
         if result.status == "PASS":
             self.successful += 1
         elif result.status == "FAIL":
@@ -100,7 +102,6 @@ class ExecutionSummary(BaseModel):
         elif result.status == "TIMEOUT":
             self.timed_out += 1
 
-        # Update timing statistics
         self.total_execution_time_ms += result.execution_time_ms
         self.average_execution_time_ms = (
             self.total_execution_time_ms / self.total_bundles
@@ -116,15 +117,15 @@ class ReplayBundle(BaseModel):
     created_at: datetime
 
     @classmethod
-    def from_path(cls, bundle_path: str) -> "ReplayBundle":
+    def from_path(cls, bundle_path: str) -> ReplayBundle:
         """Create a ReplayBundle from a file path."""
         path = Path(bundle_path)
         if not path.exists():
             raise FileNotFoundError(f"Bundle not found: {bundle_path}")
 
         stat = path.stat()
-        with open(path, "rb") as f:
-            bundle_hash = hashlib.sha256(f.read()).hexdigest()
+        with open(path, "rb") as handle:
+            bundle_hash = hashlib.sha256(handle.read()).hexdigest()
 
         return cls(
             path=path,

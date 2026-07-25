@@ -1,0 +1,19 @@
+{
+  "mirror_name": "post-incident-proofs",
+  "source_repo": "https://github.com/SentinelOps-CI/post-incident-proofs",
+  "pinned_commit": "3cdfdf09c20f08ad5221d29607b5a9726295ad10",
+  "vendored_files": [
+    "LineageBundle.schema.json",
+    "MorphReplayReport.schema.json",
+    "TransformationRecord.schema.json"
+  ],
+  "local_digests": {
+    "LineageBundle.schema.json": "sha256:1b560005b7479f7c55484dfadcaf172ecb72fe4b995d394c633ed1af406e0463",
+    "MorphReplayReport.schema.json": "sha256:afca63d0df978f697eb8b60e4e1d6df08fa0e55059df0e13eaa185d3603a41fd",
+    "TransformationRecord.schema.json": "sha256:863c9844dbf67892f1bbc41d769d3b7a591d2fa8e05c1ba664fb5ffd78cc93d5"
+  },
+  "sync_policy": "Fail CI on digest drift. Cross-link PCS by digest only; do not promote Morph reports into PCS.",
+  "non_claims": [
+    "PIP emission is observational/differential linkage only."
+  ]
+}

@@ -5,41 +5,66 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "morph-replay-runner"
 version = "0.1.0"
-description = "CLI tool for running TRACE-REPLAY-KIT bundles with branch-N parallelism on Morph Cloud"
+description = "Hermetic branch-N execution backend for SentinelOps-CI with observational PCS/PIP evidence"
 authors = [
     {name = "SentinelOps-CI", email = "team@sentinelops.ci"}
 ]
 readme = "README.md"
 license = {text = "Apache-2.0"}
-requires-python = ">=3.8"
+requires-python = ">=3.9"
+keywords = [
+    "sentinelops",
+    "hermetic",
+    "branch-n",
+    "pcs",
+    "pip",
+    "morph",
+    "replay",
+    "evidence",
+]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
     "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Topic :: Security",
+    "Topic :: Software Development :: Quality Assurance",
+    "Typing :: Typed",
 ]
 dependencies = [
     "morphcloud>=0.1.91",
     "click>=8.0.0",
     "pydantic>=2.0.0",
     "rich>=13.0.0",
-    "aiofiles>=23.0.0",
-    "asyncio-mqtt>=0.16.0",
+    "jsonschema[format]>=4.18.0",
+    "referencing>=0.30.0",
 ]
 
 [project.optional-dependencies]
 dev = [
     "pytest>=7.0.0",
-    "pytest-asyncio>=0.21.0",
     "black>=23.0.0",
     "isort>=5.12.0",
     "mypy>=1.0.0",
     "ruff>=0.1.0",
+    "types-jsonschema>=4.0.0",
+    "pip-audit>=2.6.0",
+]
+pcs = [
+    "pcs-core>=0.1.0",
+]
+pip = [
+    "post-incident>=0.1.0",
+]
+ovk = [
+    "open-verification-kernel==1.2.1",
 ]
 
 [project.scripts]
@@ -49,27 +74,75 @@ replay-runner = "runner.main:main"
 Homepage = "https://github.com/SentinelOps-CI/morph-replay-runner"
 Repository = "https://github.com/SentinelOps-CI/morph-replay-runner"
 Issues = "https://github.com/SentinelOps-CI/morph-replay-runner/issues"
+Changelog = "https://github.com/SentinelOps-CI/morph-replay-runner/blob/main/CHANGELOG.md"
+Documentation = "https://github.com/SentinelOps-CI/morph-replay-runner#readme"
+"Security Policy" = "https://github.com/SentinelOps-CI/morph-replay-runner/blob/main/SECURITY.md"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["runner*", "schemas*"]
+include = ["runner*"]
+
+[tool.setuptools.package-data]
+runner = ["py.typed"]
 
 [tool.black]
 line-length = 88
-target-version = ['py38']
+target-version = ['py39']
+extend-exclude = '''
+/(
+  \.mypy_cache
+  | \.ruff_cache
+  | \.pytest_cache
+  | branches-smoke
+  | release-bundle
+  | evidence
+)/
+'''
 
 [tool.isort]
 profile = "black"
 line_length = 88
+skip_glob = [".mypy_cache/*", "branches-smoke/*", "release-bundle/*"]
 
 [tool.mypy]
-python_version = "3.8"
+python_version = "3.9"
 warn_return_any = true
 warn_unused_configs = true
+warn_unused_ignores = true
 disallow_untyped_defs = true
+disallow_any_generics = true
+no_implicit_optional = true
+strict = true
+warn_redundant_casts = true
+mypy_path = "."
+packages = ["runner"]
+
+[[tool.mypy.overrides]]
+module = ["morphcloud.*"]
+ignore_missing_imports = true
 
 [tool.ruff]
-target-version = "py38"
+target-version = "py39"
 line-length = 88
-select = ["E", "F", "B", "I", "N", "UP", "W", "C4", "SIM", "ARG", "PIE", "T20", "Q", "RSE", "RET", "SLF", "SLOT", "TCH", "TID", "TCH", "ARG", "PIE", "SIM", "LOG", "RUF"]
-ignore = ["E501", "B008", "C901"]
+extend-exclude = [".mypy_cache", "branches-smoke", "release-bundle", "evidence"]
+
+[tool.ruff.lint]
+select = ["E", "F", "B", "I", "UP", "W", "C4", "SIM", "ARG", "PIE", "RUF"]
+ignore = [
+  "E501",
+  "B008",
+  "C901",
+  "UP007",  # Optional[] kept for explicit 3.9-friendly annotations
+  "UP006",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+asyncio_default_fixture_loop_scope = "function"
+filterwarnings = [
+    "error",
+    "ignore::DeprecationWarning:morphcloud.*",
+    "ignore::DeprecationWarning:pydantic.*",
+    "ignore::pytest.PytestDeprecationWarning",
+]

@@ -1,2 +1,0 @@
-[console_scripts]
-replay-runner = runner.main:main

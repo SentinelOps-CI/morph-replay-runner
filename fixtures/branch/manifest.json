@@ -1,0 +1,250 @@
+{
+  "schema_version": "mrr.BranchReplayManifest.v1",
+  "manifest_id": "manifest-demo",
+  "incident_ref": {
+    "incident_id": "inc-demo",
+    "incident_digest": "sha256:cad4eaad4523d1b78d9de32b78b3a873380aad8a75c2646fffe921e182f01907"
+  },
+  "snapshot_ref": {
+    "snapshot_id": "snap-demo",
+    "snapshot_digest": "sha256:9047a18b16b4542b7388faa6d97a47a79c793d0fa280013bb0587fa35f932785"
+  },
+  "execution_profile_digest": "sha256:130d846c41fc26fa002d68e1a854faaeabeaf429069807437b2c14f761eada07",
+  "branches": [
+    {
+      "branch_id": "branch-00",
+      "intervention": {
+        "intervention_id": "iv-00",
+        "artifact_paths": [
+          "branch-00.json"
+        ]
+      },
+      "action_sequence": [
+        "replay",
+        "branch-00"
+      ],
+      "claim_class": "RuntimeObserved"
+    },
+    {
+      "branch_id": "branch-01",
+      "intervention": {
+        "intervention_id": "iv-01",
+        "artifact_paths": [
+          "branch-01.json"
+        ]
+      },
+      "action_sequence": [
+        "replay",
+        "branch-01"
+      ],
+      "claim_class": "RuntimeObserved"
+    },
+    {
+      "branch_id": "branch-02",
+      "intervention": {
+        "intervention_id": "iv-02",
+        "artifact_paths": [
+          "branch-02.json"
+        ]
+      },
+      "action_sequence": [
+        "replay",
+        "branch-02"
+      ],
+      "claim_class": "RuntimeObserved"
+    },
+    {
+      "branch_id": "branch-03",
+      "intervention": {
+        "intervention_id": "iv-03",
+        "artifact_paths": [
+          "branch-03.json"
+        ]
+      },
+      "action_sequence": [
+        "replay",
+        "branch-03"
+      ],
+      "claim_class": "RuntimeObserved"
+    },
+    {
+      "branch_id": "branch-04",
+      "intervention": {
+        "intervention_id": "iv-04",
+        "artifact_paths": [
+          "branch-04.json"
+        ]
+      },
+      "action_sequence": [
+        "replay",
+        "branch-04"
+      ],
+      "claim_class": "RuntimeObserved"
+    },
+    {
+      "branch_id": "branch-05",
+      "intervention": {
+        "intervention_id": "iv-05",
+        "artifact_paths": [
+          "branch-05.json"
+        ]
+      },
+      "action_sequence": [
+        "replay",
+        "branch-05"
+      ],
+      "claim_class": "RuntimeObserved"
+    },
+    {
+      "branch_id": "branch-06",
+      "intervention": {
+        "intervention_id": "iv-06",
+        "artifact_paths": [
+          "branch-06.json"
+        ]
+      },
+      "action_sequence": [
+        "replay",
+        "branch-06"
+      ],
+      "claim_class": "RuntimeObserved"
+    },
+    {
+      "branch_id": "branch-07",
+      "intervention": {
+        "intervention_id": "iv-07",
+        "artifact_paths": [
+          "branch-07.json"
+        ]
+      },
+      "action_sequence": [
+        "replay",
+        "branch-07"
+      ],
+      "claim_class": "RuntimeObserved"
+    },
+    {
+      "branch_id": "branch-08",
+      "intervention": {
+        "intervention_id": "iv-08",
+        "artifact_paths": [
+          "branch-08.json"
+        ]
+      },
+      "action_sequence": [
+        "replay",
+        "branch-08"
+      ],
+      "claim_class": "RuntimeObserved"
+    },
+    {
+      "branch_id": "branch-09",
+      "intervention": {
+        "intervention_id": "iv-09",
+        "artifact_paths": [
+          "branch-09.json"
+        ]
+      },
+      "action_sequence": [
+        "replay",
+        "branch-09"
+      ],
+      "claim_class": "RuntimeObserved"
+    },
+    {
+      "branch_id": "branch-10",
+      "intervention": {
+        "intervention_id": "iv-10",
+        "artifact_paths": [
+          "branch-10.json"
+        ]
+      },
+      "action_sequence": [
+        "replay",
+        "branch-10"
+      ],
+      "claim_class": "RuntimeObserved"
+    },
+    {
+      "branch_id": "branch-11",
+      "intervention": {
+        "intervention_id": "iv-11",
+        "artifact_paths": [
+          "branch-11.json"
+        ]
+      },
+      "action_sequence": [
+        "replay",
+        "branch-11"
+      ],
+      "claim_class": "RuntimeObserved"
+    },
+    {
+      "branch_id": "branch-12",
+      "intervention": {
+        "intervention_id": "iv-12",
+        "artifact_paths": [
+          "branch-12.json"
+        ]
+      },
+      "action_sequence": [
+        "replay",
+        "branch-12"
+      ],
+      "claim_class": "RuntimeObserved"
+    },
+    {
+      "branch_id": "branch-13",
+      "intervention": {
+        "intervention_id": "iv-13",
+        "artifact_paths": [
+          "branch-13.json"
+        ]
+      },
+      "action_sequence": [
+        "replay",
+        "branch-13"
+      ],
+      "claim_class": "RuntimeObserved"
+    },
+    {
+      "branch_id": "branch-14",
+      "intervention": {
+        "intervention_id": "iv-14",
+        "artifact_paths": [
+          "branch-14.json"
+        ]
+      },
+      "action_sequence": [
+        "replay",
+        "branch-14"
+      ],
+      "claim_class": "RuntimeObserved"
+    },
+    {
+      "branch_id": "branch-15",
+      "intervention": {
+        "intervention_id": "iv-15",
+        "artifact_paths": [
+          "branch-15.json"
+        ]
+      },
+      "action_sequence": [
+        "replay",
+        "branch-15"
+      ],
+      "claim_class": "RuntimeObserved"
+    }
+  ],
+  "retry_policy": {
+    "max_retries": 1,
+    "retry_on": [
+      "TIMEOUT",
+      "ERROR"
+    ]
+  },
+  "cancellation_policy": {
+    "cancel_others_on_failure": false
+  },
+  "branch_independence": true
+}

@@ -1,6 +1,8 @@
+# Runtime pins for editable / Docker installs.
+# Canonical metadata lives in pyproject.toml.
 morphcloud>=0.1.91
 click>=8.0.0
 pydantic>=2.0.0
 rich>=13.0.0
-aiofiles>=23.0.0
-asyncio-mqtt>=0.16.0
+jsonschema[format]>=4.18.0
+referencing>=0.30.0
