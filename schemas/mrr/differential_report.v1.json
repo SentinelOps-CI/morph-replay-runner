@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://morph-replay-runner.local/schemas/mrr/differential_report.v1.json",
+  "title": "DifferentialReport",
+  "description": "Pairwise differential state. absent ≠ equal. No preferred-branch or causality language.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "left_branch_id",
+    "right_branch_id",
+    "comparisons",
+    "report_digest"
+  ],
+  "properties": {
+    "schema_version": { "const": "mrr.DifferentialReport.v1" },
+    "left_branch_id": { "type": "string", "minLength": 1 },
+    "right_branch_id": { "type": "string", "minLength": 1 },
+    "comparisons": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "terminal_state",
+        "process_action",
+        "authorization",
+        "side_effect",
+        "reward",
+        "verifier_decision",
+        "resource",
+        "unresolved_external_dependency"
+      ],
+      "properties": {
+        "terminal_state": { "$ref": "#/$defs/field_comparison" },
+        "process_action": { "$ref": "#/$defs/field_comparison" },
+        "authorization": { "$ref": "#/$defs/field_comparison" },
+        "side_effect": { "$ref": "#/$defs/field_comparison" },
+        "reward": { "$ref": "#/$defs/field_comparison" },
+        "verifier_decision": { "$ref": "#/$defs/field_comparison" },
+        "resource": { "$ref": "#/$defs/field_comparison" },
+        "unresolved_external_dependency": { "$ref": "#/$defs/field_comparison" }
+      }
+    },
+    "report_digest": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "non_claims": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "$defs": {
+    "field_comparison": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["result"],
+      "properties": {
+        "result": {
+          "type": "string",
+          "enum": [
+            "equal",
+            "different",
+            "absent_left",
+            "absent_right",
+            "absent_both"
+          ]
+        },
+        "left": {},
+        "right": {}
+      }
+    }
+  }
+}
