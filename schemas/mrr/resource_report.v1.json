@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://morph-replay-runner.local/schemas/mrr/resource_report.v1.json",
+  "title": "ResourceReport",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "branch_id", "metrics"],
+  "properties": {
+    "schema_version": { "const": "mrr.ResourceReport.v1" },
+    "branch_id": { "type": "string", "minLength": 1 },
+    "metrics": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["value", "unit", "availability", "source"],
+        "properties": {
+          "value": {
+            "type": ["number", "string", "null"]
+          },
+          "unit": { "type": "string", "minLength": 1 },
+          "availability": {
+            "type": "string",
+            "enum": ["observed", "unavailable", "not_applicable"]
+          },
+          "source": {
+            "type": "string",
+            "enum": ["provider", "runner", "guest"]
+          }
+        }
+      }
+    },
+    "budget_violations": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  }
+}
