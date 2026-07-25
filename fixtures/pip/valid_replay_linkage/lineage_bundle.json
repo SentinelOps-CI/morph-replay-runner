@@ -1,0 +1,64 @@
+{
+  "schema_version": "pip.LineageBundle.v1",
+  "bundle_id": "lin-mrr-001",
+  "incident_id": "inc-demo",
+  "nodes": [
+    {
+      "node_id": "n0",
+      "artifact_digest": "sha256:289c58f19e2b126468dae353a63ea5b6d41161e8ba7ae3eada37643fb0e2b66f",
+      "role": "source"
+    },
+    {
+      "node_id": "n1",
+      "artifact_digest": "sha256:8b82eb9475941110dc4bb6225594876cfabbf4676dafbeebe764c9021352df1a",
+      "role": "intermediate"
+    },
+    {
+      "node_id": "n2",
+      "artifact_digest": "sha256:985a5e7b20cd925ba65f3c58921a7b5d4343000f7f19e2cf6532320d8fea0ca5",
+      "role": "replay"
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": "n0",
+      "to_node_id": "n1",
+      "transformation_id": "t-norm"
+    },
+    {
+      "from_node_id": "n1",
+      "to_node_id": "n2",
+      "transformation_id": "t-replay"
+    }
+  ],
+  "transformations": [
+    {
+      "schema_version": "pip.TransformationRecord.v1",
+      "transformation_id": "t-norm",
+      "transformation_type": "normalization",
+      "input_artifact_digests": [
+        "sha256:289c58f19e2b126468dae353a63ea5b6d41161e8ba7ae3eada37643fb0e2b66f"
+      ],
+      "output_artifact_digest": "sha256:8b82eb9475941110dc4bb6225594876cfabbf4676dafbeebe764c9021352df1a",
+      "implementation_id": "morph-replay-runner",
+      "implementation_version": "0.1.0",
+      "container_digest": "sha256:a42d519714d616e9411dbceec4b52808bd6b1ee53e6f6497a281d655357d8b71",
+      "source_commit": "b3018d790e3e7c622b28641c0230a61bb3b78955",
+      "record_digest": "sha256:3be6704ac3c5387837079e6cc4875ede904bbd16b3937028ab6284290e2e71c7"
+    },
+    {
+      "schema_version": "pip.TransformationRecord.v1",
+      "transformation_id": "t-replay",
+      "transformation_type": "synthetic_variant_derivation",
+      "input_artifact_digests": [
+        "sha256:8b82eb9475941110dc4bb6225594876cfabbf4676dafbeebe764c9021352df1a"
+      ],
+      "output_artifact_digest": "sha256:985a5e7b20cd925ba65f3c58921a7b5d4343000f7f19e2cf6532320d8fea0ca5",
+      "implementation_id": "morph-replay-runner",
+      "implementation_version": "0.1.0",
+      "container_digest": "sha256:a42d519714d616e9411dbceec4b52808bd6b1ee53e6f6497a281d655357d8b71",
+      "source_commit": "b3018d790e3e7c622b28641c0230a61bb3b78955",
+      "record_digest": "sha256:363f28a2711ee54e606b3cd632208e4e4713d0e526b00966fb137449b32bebeb"
+    }
+  ]
+}
